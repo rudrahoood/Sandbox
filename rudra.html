@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rudra</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000000;
+      --fg: #ffffff;
+      --accent: #38bdf8;
+      --muted: #1e1e1e;
+      --dim: #6b7280;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Syne', sans-serif;
+      overflow: hidden;
+    }
+
+    /* grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.35;
+    }
+
+    /* background accent blob */
+    .blob {
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      pointer-events: none;
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    /* layout */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(2rem, 6vw, 5rem);
+      position: relative;
+    }
+
+    /* top bar */
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .logo {
+      font-size: clamp(0.85rem, 1.5vw, 1rem);
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* center content */
+    .center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem 0;
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .headline {
+      font-size: clamp(3rem, 9vw, 7.5rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.65s forwards;
+    }
+
+    .headline .name {
+      color: var(--fg);
+      display: block;
+    }
+
+    .headline .name span {
+      color: var(--accent);
+    }
+
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: var(--muted);
+      margin: 2.5rem 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .wip-text {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      font-weight: 400;
+      color: var(--dim);
+      max-width: 360px;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.95s forwards;
+    }
+
+    .wip-text strong {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    /* social */
+    .social {
+      margin-top: 2.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.1s forwards;
+    }
+
+    .social-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .insta-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--fg);
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      position: relative;
+      transition: color 0.25s ease;
+    }
+
+    .insta-link::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .insta-link:hover { color: var(--accent); }
+    .insta-link:hover::after { width: 100%; }
+
+    .insta-icon {
+      width: 22px;
+      height: 22px;
+      opacity: 0.6;
+      transition: opacity 0.25s;
+    }
+
+    .insta-link:hover .insta-icon { opacity: 1; }
+
+    /* bottom bar */
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.3s forwards;
+    }
+
+    .year {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .tagline {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-align: right;
+    }
+
+    /* vertical rule */
+    .v-rule {
+      position: fixed;
+      left: clamp(2rem, 6vw, 5rem);
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--muted) 30%, var(--muted) 70%, transparent);
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      html, body { overflow: auto; }
+      .bottom { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+      .tagline { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob"></div>
+  <div class="v-rule"></div>
+
+  <div class="page">
+
+    <!-- top -->
+    <div class="top">
+      <span class="logo">Rudra</span>
+      <div class="status">
+        <div class="dot"></div>
+        <span>work in progress</span>
+      </div>
+    </div>
+
+    <!-- center -->
+    <div class="center">
+      <p class="eyebrow">Hello, World</p>
+      <h1 class="headline">
+        <span class="name">I'm <span>Rudra.</span></span>
+      </h1>
+      <div class="divider"></div>
+      <p class="wip-text">
+        <strong>We're still working on it.</strong><br/>
+        Something new is being built here.<br/>Stay tuned.
+      </p>
+
+      <div class="social">
+        <p class="social-label">Follow along</p>
+        <a class="insta-link" href="https://instagram.com/rudrasvn" target="_blank" rel="noopener">
+          <svg class="insta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.7" fill="currentColor" stroke="none"/>
+          </svg>
+          @rudrasvn
+        </a>
+      </div>
+    </div>
+
+    <!-- bottom -->
+    <div class="bottom">
+      <span class="year">© 2026 Rudra</span>
+      <span class="tagline">portfolio · coming soon</span>
+    </div>
+
+  </div>
+</body>
+</html>
